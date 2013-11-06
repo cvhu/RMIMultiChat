@@ -1,6 +1,5 @@
 package edu.utexas.ee382vJulien;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -8,10 +7,21 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ChatRegistryImpl implements ChatRegistry{
 
+    protected ChatRegistryImpl() throws RemoteException {
+//        super();
+        // TODO Auto-generated constructor stub
+    }
+
     @Override
-    public void register() throws RemoteException {
+    public void register(ChatClient client) throws RemoteException {
         // TODO Auto-generated method stub
-        
+        client.showMessage("registered for client");
+    }
+
+    @Override
+    public void register(ChatroomServer server) throws RemoteException {
+        // TODO Auto-generated method stub
+        server.showMessage("registered for server");
     }
 
     @Override
@@ -33,9 +43,8 @@ public class ChatRegistryImpl implements ChatRegistry{
             
             Registry registry = LocateRegistry.getRegistry();
             registry.bind("ChatRegistry", stub);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
