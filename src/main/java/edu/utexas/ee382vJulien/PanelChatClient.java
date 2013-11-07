@@ -7,26 +7,44 @@ import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
+
 import java.awt.Font;
 
+@SuppressWarnings("serial")
 public class PanelChatClient extends JPanel {
+    
+    private JLabel lblName;
+    private JLabel lblDescription;
+    private JLabel lblJoined;
+    private Chatroom chatroom;
 
     /**
      * Create the panel.
      */
-    public PanelChatClient() {
+    public PanelChatClient(Chatroom chatroom) {
+        this.chatroom = chatroom;
+        initialize();
+        setChatroom();
+    }
+    
+    public void setChatroom() {
+        lblName.setText("Name: " + chatroom.getName());
+        lblDescription.setText("Description: " + chatroom.getDescription());
+        lblJoined.setText(chatroom.getClientCount() + " joined");
+    }
+    
+    public void initialize() {
+        lblName = new JLabel("Name: ");
         
-        JLabel lblName = new JLabel("Name: ");
-        
-        JLabel lblDescription = new JLabel("Description: ");
+        lblDescription = new JLabel("Description: ");
         lblDescription.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
         lblDescription.setVerticalAlignment(SwingConstants.TOP);
         
-        JButton btnJoin = new JButton("join");
+        JButton btnJoin = new JButton("Join");
         
         JButton btnLeave = new JButton("Leave");
         
-        JLabel lblJoined = new JLabel("0 joined");
+        lblJoined = new JLabel("0 joined");
         lblJoined.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
         GroupLayout groupLayout = new GroupLayout(this);
         groupLayout.setHorizontalGroup(
@@ -60,7 +78,6 @@ public class PanelChatClient extends JPanel {
                         .addComponent(btnLeave)))
         );
         setLayout(groupLayout);
-
     }
 
 }

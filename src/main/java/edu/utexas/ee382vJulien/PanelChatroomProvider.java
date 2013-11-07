@@ -1,24 +1,41 @@
 package edu.utexas.ee382vJulien;
 
-import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
+@SuppressWarnings("serial")
 public class PanelChatroomProvider extends JPanel {
-
+    
+    private JLabel lblName;
+    private JLabel lblDescription;
+    private JLabel lblClients;
+    private Chatroom chatroom;
+    
     /**
      * Create the panel.
      */
-    public PanelChatroomProvider() {
+    public PanelChatroomProvider(Chatroom chatroom) {
+        this.chatroom = chatroom;
+        initialize();
+        setChatroom();
+    }
+    
+    public void setChatroom() {
+        lblName.setText("Name:" + chatroom.getName());
+        lblDescription.setText("Description:" + chatroom.getDescription());
+        lblClients.setText(chatroom.getClientCount() + " joined");
+    }
+    
+    public void initialize() {
+        lblName = new JLabel("Name: ");
         
-        JLabel lblName = new JLabel("Name: ");
+        lblDescription = new JLabel("Description:");
         
-        JLabel lblDescription = new JLabel("Description:");
-        
-        JLabel lblClients = new JLabel("Clients: ");
+        lblClients = new JLabel("Clients: ");
         
         JButton btnCloseChatroom = new JButton("Close Chatroom");
         GroupLayout groupLayout = new GroupLayout(this);
@@ -51,7 +68,6 @@ public class PanelChatroomProvider extends JPanel {
                     .addContainerGap(25, Short.MAX_VALUE))
         );
         setLayout(groupLayout);
-
     }
 
 }
