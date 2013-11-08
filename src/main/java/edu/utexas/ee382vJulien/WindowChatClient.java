@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -28,6 +29,7 @@ public class WindowChatClient {
     private JPanel panelChatrooms;
     private JComboBox comboBoxChatroom;
     private StringBuffer stringBuffer;
+    private ChatClientImpl chatClient;
 
     /**
      * Launch the application.
@@ -36,10 +38,8 @@ public class WindowChatClient {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    WindowChatClient window = new WindowChatClient();
+                    WindowChatClient window = new WindowChatClient(new ChatClientImpl("localhost"));
                     window.frame.setVisible(true);
-                    window.addChatroom(new Chatroom("cr1", "crd1"));
-                    window.addChatroom(new Chatroom("cr2", "crd2"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -50,22 +50,34 @@ public class WindowChatClient {
     /**
      * Create the application.
      */
-    public WindowChatClient() {
-        stringBuffer = new StringBuffer();
+    public WindowChatClient(ChatClientImpl chatClient) {
+        this.chatClient = chatClient;
+        chatClient.attachWindow(this);
+        this.stringBuffer = new StringBuffer();
         initialize();
+        frame.setVisible(true);
     }
     
-    public void addChatroom(Chatroom chatroom) {
-        PanelChatClient panelChatroom = new PanelChatClient(chatroom);
+    public void addChatroom(ChatroomServer chatroom) {
+        PanelChatClient panelChatroom = new PanelChatClient(chatroom, chatClient);
         panelChatrooms.add(panelChatroom);
         panelChatrooms.revalidate();
         panelChatrooms.repaint();
-        comboBoxChatroom.addItem(chatroom.getName());
+        try {
+            comboBoxChatroom.addItem(new ComboItem(chatroom.getName(), chatroom.getId()));
+        } catch (RemoteException e) {
+            comboBoxChatroom.addItem("Connection Error");
+        }
     }
     
     public void sendMessage() {
-        String message = String.format("[%s] %s\n", comboBoxChatroom.getSelectedObjects()[0], textField.getText());
+        chatClient.talk((String) ((ComboItem) comboBoxChatroom.getSelectedObjects()[0]).getValue(), textField.getText());
+        textField.setText("");
+    }
+    
+    public void showMessage(String message) {
         stringBuffer.append(message);
+        stringBuffer.append("\n");
         textArea.setText(stringBuffer.toString());
     }
 
@@ -193,5 +205,23 @@ public class WindowChatClient {
         
         panelChatrooms = new JPanel(new GridLayout(0, 1, 3, 1));
         panelChatroomsWrapper.add(new JScrollPane(panelChatrooms), BorderLayout.CENTER);
+    }
+}
+
+class ComboItem {
+    private String label;
+    private String value;
+    
+    public ComboItem (String label, String value) {
+        this.label = label;
+        this.value = value;
+    }
+    
+    public String toString() {
+        return label;
+    }
+    
+    public String getValue() {
+        return value;
     }
 }

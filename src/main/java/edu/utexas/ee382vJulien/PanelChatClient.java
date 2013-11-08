@@ -9,6 +9,9 @@ import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 @SuppressWarnings("serial")
 public class PanelChatClient extends JPanel {
@@ -16,21 +19,46 @@ public class PanelChatClient extends JPanel {
     private JLabel lblName;
     private JLabel lblDescription;
     private JLabel lblJoined;
-    private Chatroom chatroom;
+    private ChatroomServer chatroom;
+    private ChatClientImpl chatClient;
+    private JButton btnJoin;
+    private JButton btnLeave;
 
     /**
      * Create the panel.
      */
-    public PanelChatClient(Chatroom chatroom) {
+    public PanelChatClient(ChatroomServer chatroom, ChatClientImpl chatClient) {
         this.chatroom = chatroom;
+        this.chatClient = chatClient;
         initialize();
         setChatroom();
     }
     
     public void setChatroom() {
-        lblName.setText("Name: " + chatroom.getName());
-        lblDescription.setText("Description: " + chatroom.getDescription());
-        lblJoined.setText(chatroom.getClientCount() + " joined");
+        try {
+            lblName.setText("Name: " + chatroom.getName());
+            lblDescription.setText("Description: " + chatroom.getDescription());
+            lblJoined.setText(chatroom.getClientCount() + " joined");
+        } catch (RemoteException e) {
+            lblName.setText("Connection error");
+            lblDescription.setText("");
+            lblJoined.setText("");
+        }
+    }
+    
+    public void joinChatroom() {
+        btnLeave.setEnabled(true);
+        btnJoin.setEnabled(false);
+        try {
+            chatClient.joinChatroom(chatroom.getId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void leaveChatroom() {
+        btnLeave.setEnabled(false);
+        btnJoin.setEnabled(true);
     }
     
     public void initialize() {
@@ -40,9 +68,24 @@ public class PanelChatClient extends JPanel {
         lblDescription.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
         lblDescription.setVerticalAlignment(SwingConstants.TOP);
         
-        JButton btnJoin = new JButton("Join");
+        btnJoin = new JButton("Join");
+        btnJoin.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                joinChatroom();
+            }
+        });
         
-        JButton btnLeave = new JButton("Leave");
+        btnLeave = new JButton("Leave");
+        btnLeave.setEnabled(false);
+        btnLeave.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                leaveChatroom();
+            }
+        });
         
         lblJoined = new JLabel("0 joined");
         lblJoined.setFont(new Font("Lucida Grande", Font.PLAIN, 10));

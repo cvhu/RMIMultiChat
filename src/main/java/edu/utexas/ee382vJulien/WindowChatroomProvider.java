@@ -25,6 +25,7 @@ public class WindowChatroomProvider {
     private JTextField textFieldDescription;
     private JLabel lblMessage;
     private JPanel chatrooms;
+    private ChatroomProvider chatroomProvider;
 
     /**
      * Launch the application.
@@ -33,7 +34,7 @@ public class WindowChatroomProvider {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    WindowChatroomProvider window = new WindowChatroomProvider();
+                    WindowChatroomProvider window = new WindowChatroomProvider(new ChatroomProvider("localhost"));
                     window.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -45,8 +46,10 @@ public class WindowChatroomProvider {
     /**
      * Create the application.
      */
-    public WindowChatroomProvider() {
+    public WindowChatroomProvider(ChatroomProvider chatroomProvider) {
+        this.chatroomProvider = chatroomProvider;
         initialize();
+        frame.setVisible(true);
     }
 
     public void addChatroom() {
@@ -61,6 +64,7 @@ public class WindowChatroomProvider {
             chatrooms.revalidate();
             chatrooms.repaint();
             resetForm();
+            chatroomProvider.addChatroom(chatroom);
         }
     }
     
@@ -165,6 +169,5 @@ public class WindowChatroomProvider {
         
         chatrooms = new JPanel(new GridLayout(0, 1, 3, 3));
         panelChatrooms.add(new JScrollPane(chatrooms), BorderLayout.CENTER);
-        
     }
 }

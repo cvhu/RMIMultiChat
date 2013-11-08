@@ -1,28 +1,48 @@
 package edu.utexas.ee382vJulien;
 
-import java.io.IOException;
+import java.awt.EventQueue;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 
 @SuppressWarnings("serial")
 public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
     
+    private String id;
     private ChatRegistry chatRegistry;
+    private WindowChatClient window;
+    private HashMap<String, ChatroomServer> chatroomsMap;
     
-    public ChatClientImpl() throws RemoteException {
+    public ChatClientImpl(String host) throws RemoteException {
         super();
-    }
-    
-    protected void launch() {
-        while (true) {
-            
+        chatroomsMap = new HashMap<String, ChatroomServer>();
+        try{
+            Registry registry = LocateRegistry.getRegistry(host);
+            chatRegistry = (ChatRegistry) registry.lookup("ChatRegistry");
+            register();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (AccessException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
-
-    public void register(ChatRegistry registry) throws RemoteException {
-        chatRegistry = registry;
+    
+    public void talk(String chatroomId, String message) {
+        ChatroomServer server = chatroomsMap.get(chatroomId);
+        try {
+            server.talk(id, message);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void register() throws RemoteException {
         chatRegistry.register(this);
     }
     
@@ -31,16 +51,55 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         System.out.println(message);
     }
     
-    public static void main(String[] args) throws Exception {
-        String host = args[0];
-        try{
-            Registry registry = LocateRegistry.getRegistry(host);
-            ChatRegistry stub = (ChatRegistry) registry.lookup("ChatRegistry");
-            ChatClientImpl client = new ChatClientImpl();
-            client.register(stub);
-            client.launch();
-        } catch (IOException e) {
+    @Override
+    public void printMessage(String message) throws RemoteException {
+        window.showMessage(message);
+    }
+
+    @Override
+    public void addChatroomServer(ChatroomServer server) throws RemoteException {
+        chatroomsMap.put(server.getId(), server);
+        System.out.println("Added chatroom server " + server.getId());
+        window.addChatroom(server);
+    }
+    
+
+    @Override
+    public void registerId(String id) throws RemoteException {
+        this.id = id;
+        System.out.println("register id: " + id);
+    }
+    
+    public void joinChatroom(String chatroomId) {
+        System.out.println("join chatroom " + chatroomId);
+        ChatroomServer server = chatroomsMap.get(chatroomId);
+        try {
+            server.join(this.id);
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+    
+    @Override
+    public String getId() throws RemoteException{
+        return this.id;
+    }
+    
+    public void attachWindow(WindowChatClient window) {
+        this.window = window;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        final ChatClientImpl chatClient = new ChatClientImpl(args[0]);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new WindowChatClient(chatClient);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

@@ -4,24 +4,43 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 
 public class ChatRegistryImpl implements ChatRegistry{
+    
+    private Integer chatroomServersCount;
+    private HashMap<String, ChatroomServer> chatroomServersMap;
+    private Integer chatClientsCount;
+    private HashMap<String, ChatClient> chatClientsMap;
 
     protected ChatRegistryImpl() throws RemoteException {
-//        super();
-        // TODO Auto-generated constructor stub
+        super();
+        chatroomServersCount = 0;
+        chatroomServersMap = new HashMap<String, ChatroomServer>();
+        chatClientsCount = 0;
+        chatClientsMap = new HashMap<String, ChatClient>();
     }
 
     @Override
     public void register(ChatClient client) throws RemoteException {
-        // TODO Auto-generated method stub
-        client.showMessage("registered for client");
+        chatClientsCount++;
+        String clientId = "client#" + chatClientsCount;
+        chatClientsMap.put(clientId, client);
+        client.registerId(clientId);
+        client.showMessage("registered for " + clientId);
     }
 
     @Override
     public void register(ChatroomServer server) throws RemoteException {
-        // TODO Auto-generated method stub
-        server.showMessage("registered for server");
+        chatroomServersCount++;
+        String chatroomId = "cr#" + chatroomServersCount;
+        server.registerId(chatroomId);
+        server.showMessage("registered for server of " + chatroomId);
+        chatroomServersMap.put(chatroomId, server);
+        for (ChatClient client : chatClientsMap.values()) {
+            client.addChatroomServer(server);
+            client.showMessage(chatroomId + " is added");
+        }
     }
 
     @Override
@@ -36,6 +55,11 @@ public class ChatRegistryImpl implements ChatRegistry{
         
     }
     
+    @Override
+    public ChatClient getClient(String clientId) throws RemoteException {
+        return chatClientsMap.get(clientId);
+    }
+    
     public static void main(String[] args) throws Exception {
         try{
             ChatRegistryImpl obj = new ChatRegistryImpl();
@@ -47,4 +71,5 @@ public class ChatRegistryImpl implements ChatRegistry{
             e.printStackTrace();
         }
     }
+
 }
