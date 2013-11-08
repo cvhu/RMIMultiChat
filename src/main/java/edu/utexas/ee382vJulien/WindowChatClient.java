@@ -63,21 +63,28 @@ public class WindowChatClient {
         frame.setVisible(true);
     }
     
-    public void addChatroom(ChatroomServer chatroom) {
-        PanelChatClient panelChatroom = new PanelChatClient(chatroom, chatClient);
-        panelChatrooms.add(panelChatroom);
-        panelChatrooms.revalidate();
-        panelChatrooms.repaint();
+    public void joinChatroom(ChatroomServer chatroom) {
         try {
             ComboItem comboItem = new ComboItem(chatroom.getName(), chatroom.getId());
-            panelsMap.put(chatroom.getId(), panelChatroom);
             comboBoxChatroom.addItem(comboItem);
         } catch (RemoteException e) {
             comboBoxChatroom.addItem("Connection Error");
         }
     }
     
-    public void removeChatroom(String chatroomId) {
+    public void addChatroom(ChatroomServer chatroom) {
+        PanelChatClient panelChatroom = new PanelChatClient(chatroom, chatClient);
+        panelChatrooms.add(panelChatroom);
+        panelChatrooms.revalidate();
+        panelChatrooms.repaint();
+        try {
+            panelsMap.put(chatroom.getId(), panelChatroom);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void leaveChatroom(String chatroomId) {
         for (int i = 0; i < comboBoxChatroom.getItemCount(); i++) {
             ComboItem comboItem = (ComboItem) comboBoxChatroom.getItemAt(i);
             if (comboItem.getValue().equals(chatroomId)) {
@@ -85,6 +92,10 @@ public class WindowChatClient {
                 break;
             }
         }
+    }
+    
+    public void removeChatroom(String chatroomId) {
+        leaveChatroom(chatroomId);
         panelChatrooms.remove(panelsMap.remove(chatroomId));
         panelChatrooms.revalidate();
         panelChatrooms.repaint();

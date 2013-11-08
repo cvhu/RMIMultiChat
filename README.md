@@ -3,7 +3,14 @@ RMIMultiChat
 
 Implementation of a chatroom service using Java RMI
 
-= How to run 
+= Deliverables =
+* Demo video: http://www.youtube.com/watch?v=2Vq6zHlgsAY
+* Design Document: https://docs.google.com/document/d/1kxepEtKgdSvSTmUe8-dmfdtp7RAvhWXqtF6OnLXp9oM/edit?usp=sharing
+* Source code
+
+
+
+= How to run =
 
 1. cd <path to the top-level of the project>
 2. mvn install 

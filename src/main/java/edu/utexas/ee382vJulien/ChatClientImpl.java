@@ -93,6 +93,7 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         System.out.println("join chatroom " + chatroomId);
         ChatroomServer server = chatroomsMap.get(chatroomId);
         try {
+            window.joinChatroom(server);
             server.join(this.id);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -103,6 +104,7 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         System.out.println("leave chatroom " + chatroomId);
         ChatroomServer server = chatroomsMap.get(chatroomId);
         try {
+            window.leaveChatroom(chatroomId);
             server.leave(this.id);
         } catch (RemoteException e) {
             e.printStackTrace();
