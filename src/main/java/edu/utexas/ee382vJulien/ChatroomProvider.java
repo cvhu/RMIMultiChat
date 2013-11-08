@@ -7,6 +7,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * This class generates the Chatroom Provider GUI and handle general administrative tasks.
+ * @author cvhu
+ *
+ */
 public class ChatroomProvider {
     
     private ChatRegistry chatRegistry;
@@ -24,6 +29,12 @@ public class ChatroomProvider {
         }
     };
     
+    /**
+     * Add a new chatroom.
+     * 
+     * @param chatroom The new chatroom to be added.
+     * @return The corresponding chatroom server.
+     */
     public ChatroomServerImpl addChatroom(Chatroom chatroom) {
         try {
             return new ChatroomServerImpl(chatroom, chatRegistry);

@@ -13,6 +13,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 
+/**
+ * The GUI component used to display chatrooms on the chat client side column.
+ * 
+ * @author cvhu
+ *
+ */
 @SuppressWarnings("serial")
 public class PanelChatClient extends JPanel {
     
@@ -34,12 +40,20 @@ public class PanelChatClient extends JPanel {
         setChatroom();
     }
     
+    /**
+     * Update the clients count on this component.
+     * 
+     * @param count
+     */
     public void updateJoins(Integer count) {
         lblJoined.setText(count + " joined");
         revalidate();
         repaint();
     }
     
+    /**
+     * Set the relevant chatroom information on the GUI.
+     */
     public void setChatroom() {
         try {
             lblName.setText("Name: " + chatroom.getName());
@@ -52,6 +66,9 @@ public class PanelChatClient extends JPanel {
         }
     }
     
+    /**
+     * Send join request and handle the corresponding GUI behavior.
+     */
     public void joinChatroom() {
         btnLeave.setEnabled(true);
         btnJoin.setEnabled(false);
@@ -62,6 +79,9 @@ public class PanelChatClient extends JPanel {
         }
     }
     
+    /**
+     * Send leave request and handle the corresponding GUI behavior.
+     */
     public void leaveChatroom() {
         btnLeave.setEnabled(false);
         btnJoin.setEnabled(true);
@@ -72,6 +92,9 @@ public class PanelChatClient extends JPanel {
         }
     }
     
+    /**
+     * Setup the components.
+     */
     public void initialize() {
         lblName = new JLabel("Name: ");
         

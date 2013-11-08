@@ -6,6 +6,12 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+/**
+ * The registry that provides lookup service for all chat clients and chatroom servers.
+ * 
+ * @author cvhu
+ *
+ */
 public class ChatRegistryImpl implements ChatRegistry{
     
     private Integer chatroomServersCount;
@@ -20,7 +26,10 @@ public class ChatRegistryImpl implements ChatRegistry{
         chatClientsCount = 0;
         chatClientsMap = new HashMap<String, ChatClient>();
     }
-
+    
+    /**
+     * Register a chat client.
+     */
     @Override
     public void register(ChatClient client) throws RemoteException {
         chatClientsCount++;
@@ -33,6 +42,9 @@ public class ChatRegistryImpl implements ChatRegistry{
         }
     }
 
+    /**
+     * Register a chatroom server.
+     */
     @Override
     public void register(ChatroomServer server) throws RemoteException {
         chatroomServersCount++;
@@ -46,11 +58,17 @@ public class ChatRegistryImpl implements ChatRegistry{
         }
     }
     
+    /**
+     * De-register a chat client.
+     */
     @Override
     public void deregister(ChatClient client) throws RemoteException {
         chatClientsMap.remove(client.getId());
     }
-
+    
+    /**
+     * De-register a chatroom server.
+     */
     @Override
     public void deregister(ChatroomServer server) throws RemoteException {
         chatroomServersMap.remove(server.getId());
@@ -63,11 +81,17 @@ public class ChatRegistryImpl implements ChatRegistry{
         }
     }
     
+    /**
+     * Get the corresponding chat client stub object based on the id.
+     */
     @Override
     public ChatClient getClient(String clientId) throws RemoteException {
         return chatClientsMap.get(clientId);
     }
     
+    /**
+     * Update the clients count on all the associated GUI elements.
+     */
     @Override
     public void updateJoins(String chatroomId, Integer count)
             throws RemoteException {

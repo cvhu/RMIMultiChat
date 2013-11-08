@@ -11,6 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+/**
+ * The GUI components used to display chatroom information on the Chatroom Provider GUI.
+ * 
+ * @author cvhu
+ *
+ */
 @SuppressWarnings("serial")
 public class PanelChatroomProvider extends JPanel {
     
@@ -30,6 +36,9 @@ public class PanelChatroomProvider extends JPanel {
         setChatroom();
     }
     
+    /** 
+     * Set the corresponding chatroom information on the GUI.
+     */
     public void setChatroom() {
         try {
             lblName.setText("Name:" + chatroom.getName());
@@ -40,10 +49,18 @@ public class PanelChatroomProvider extends JPanel {
         }
     }
     
+    /**
+     * Update the clients count on the GUI.
+     * 
+     * @param count The new clients count to be updated.
+     */
     public void updateJoins(Integer count) {
         lblClients.setText(count + " joined");
     }
     
+    /**
+     * Setup the GUI components.
+     */
     public void initialize() {
         lblName = new JLabel("Name: ");
         

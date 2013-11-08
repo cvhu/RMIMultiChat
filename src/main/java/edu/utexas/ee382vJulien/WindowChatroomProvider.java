@@ -19,6 +19,12 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
 
+/**
+ * The GUI window for Chatroom Provider.
+ * 
+ * @author cvhu
+ *
+ */
 public class WindowChatroomProvider {
 
     private JFrame frame;
@@ -55,6 +61,9 @@ public class WindowChatroomProvider {
         frame.setVisible(true);
     }
 
+    /**
+     * Add a new chatroom.
+     */
     public void addChatroom() {
         String name = textFieldName.getText().trim();
         String description = textFieldDescription.getText().trim();
@@ -73,12 +82,20 @@ public class WindowChatroomProvider {
         }
     }
     
+    /**
+     * Remove a chatroom when closed.
+     * 
+     * @param chatroomId The chatroom to be removed.
+     */
     public void removePanel(String chatroomId) {
         chatrooms.remove(panelsMap.remove(chatroomId));
         chatrooms.revalidate();
         chatrooms.repaint();
     }
     
+    /**
+     * Reset the form when submitted.
+     */
     public void resetForm() {
         textFieldName.setText("");
         textFieldDescription.setText("");

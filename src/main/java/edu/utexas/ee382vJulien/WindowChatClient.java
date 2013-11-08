@@ -24,6 +24,12 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
 
+/**
+ * This class creates the GUI for ChatClient.
+ * 
+ * @author cvhu
+ *
+ */
 public class WindowChatClient {
 
     private JFrame frame;
@@ -63,6 +69,11 @@ public class WindowChatClient {
         frame.setVisible(true);
     }
     
+    /**
+     * Add the chatroom to the dropdown list when the client chooses to join one.
+     * 
+     * @param chatroom The chatroom to be joined.
+     */
     public void joinChatroom(ChatroomServer chatroom) {
         try {
             ComboItem comboItem = new ComboItem(chatroom.getName(), chatroom.getId());
@@ -72,6 +83,11 @@ public class WindowChatClient {
         }
     }
     
+    /**
+     * Add the chatroom to the side panel for the client to join.
+     * 
+     * @param chatroom The chatroom to be added.
+     */
     public void addChatroom(ChatroomServer chatroom) {
         PanelChatClient panelChatroom = new PanelChatClient(chatroom, chatClient);
         panelChatrooms.add(panelChatroom);
@@ -84,6 +100,11 @@ public class WindowChatClient {
         }
     }
     
+    /**
+     * Remove the chatroom from dropdown list when the client leaves it.
+     * 
+     * @param chatroomId The chatroom to leave.
+     */
     public void leaveChatroom(String chatroomId) {
         for (int i = 0; i < comboBoxChatroom.getItemCount(); i++) {
             ComboItem comboItem = (ComboItem) comboBoxChatroom.getItemAt(i);
@@ -94,6 +115,11 @@ public class WindowChatClient {
         }
     }
     
+    /**
+     * Remove the corresponding chatroom panel when it is closed.
+     * 
+     * @param chatroomId The chatroom to be removed.
+     */
     public void removeChatroom(String chatroomId) {
         leaveChatroom(chatroomId);
         panelChatrooms.remove(panelsMap.remove(chatroomId));
@@ -101,21 +127,40 @@ public class WindowChatClient {
         panelChatrooms.repaint();
     }
     
+    /**
+     * Delegates the new client count to the panel component.
+     * 
+     * @param chatroomId The chatroom to be updated.
+     * @param count The new client count to be updated.
+     */
     public void updateJoins(String chatroomId, Integer count) {
         panelsMap.get(chatroomId).updateJoins(count);
     }
     
+    /**
+     * Send the message to the chosen chatroom when the client press "send".
+     */
     public void sendMessage() {
         chatClient.talk((String) ((ComboItem) comboBoxChatroom.getSelectedObjects()[0]).getValue(), textField.getText());
         textField.setText("");
     }
     
+    /**
+     * Show the incoming new message in a waterfall manner.
+     * 
+     * @param message The new message to be appended.
+     */
     public void showMessage(String message) {
         stringBuffer.append(message);
         stringBuffer.append("\n");
         textArea.setText(stringBuffer.toString());
     }
     
+    /**
+     * Set the title of frame.
+     * 
+     * @param title The new title.
+     */
     public void setTitle(String title) {
         frame.setTitle(String.format("Chat Client (ID:%s)", title));
     }
@@ -255,6 +300,12 @@ public class WindowChatClient {
     }
 }
 
+/**
+ * The object used for ComboBox manipulation.
+ * 
+ * @author cvhu
+ *
+ */
 class ComboItem {
     private String label;
     private String value;

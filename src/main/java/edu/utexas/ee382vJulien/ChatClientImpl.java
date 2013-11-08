@@ -9,6 +9,12 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+/**
+ * This class implements the actual chat clients.
+ * 
+ * @author cvhu
+ *
+ */
 @SuppressWarnings("serial")
 public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
     
@@ -44,6 +50,12 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         });
     }
     
+    /**
+     * Talk a message.
+     * 
+     * @param chatroomId Chatroom to talk to.
+     * @param message Content of the talk.
+     */
     public void talk(String chatroomId, String message) {
         ChatroomServer server = chatroomsMap.get(chatroomId);
         try {
@@ -53,10 +65,18 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         }
     }
     
+    /**
+     * Register the client on the chat registry.
+     * 
+     * @throws RemoteException
+     */
     public void register() throws RemoteException {
         chatRegistry.register(this);
     }
     
+    /**
+     * Deregister the client when closing.
+     */
     public void closeClient() {
         try {
             chatRegistry.deregister(this);
@@ -65,16 +85,25 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         }
     }
     
+    /**
+     * Show message on the console.
+     */
     @Override
     public void showMessage(String message) throws RemoteException {
         System.out.println(message);
     }
     
+    /**
+     * Print out message at the GUI.
+     */
     @Override
     public void printMessage(String message) throws RemoteException {
         window.showMessage(message);
     }
 
+    /**
+     * Add a new chatroom server to both the GUI and a Map.
+     */
     @Override
     public void addChatroomServer(ChatroomServer server) throws RemoteException {
         chatroomsMap.put(server.getId(), server);
@@ -82,13 +111,20 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         window.addChatroom(server);
     }
     
-
+    /**
+     * Set the unique id specified by the chat registry.
+     */
     @Override
     public void registerId(String id) throws RemoteException {
         this.id = id;
         System.out.println("register id: " + id);
     }
     
+    /**
+     * Send a join request to the chatroom server and handle the GUI correctly.
+     * 
+     * @param chatroomId
+     */
     public void joinChatroom(String chatroomId) {
         System.out.println("join chatroom " + chatroomId);
         ChatroomServer server = chatroomsMap.get(chatroomId);
@@ -100,6 +136,11 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         }
     }
     
+    /**
+     * Send a leave request to the chatroom server and delegate the event to the GUI.
+     * 
+     * @param chatroomId
+     */
     public void leaveChatroom(String chatroomId) {
         System.out.println("leave chatroom " + chatroomId);
         ChatroomServer server = chatroomsMap.get(chatroomId);
@@ -111,20 +152,34 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         }
     }
     
+    /**
+     * ID getter.
+     */
     @Override
     public String getId() throws RemoteException{
         return this.id;
     }
    
+    /**
+     * Handle the close chatroom event.
+     */
     @Override
     public void closeChatroom(String chatroomId) throws RemoteException {
         window.removeChatroom(chatroomId);
     }
     
+    /**
+     * Set the GUI window object.
+     * 
+     * @param window The corresponding chat client GUI window.
+     */
     public void attachWindow(WindowChatClient window) {
         this.window = window;
     }
     
+    /**
+     * Update the clients count to a specific chatroom.
+     */
     @Override
     public void updateJoins(String chatroomId, Integer count)
             throws RemoteException {
