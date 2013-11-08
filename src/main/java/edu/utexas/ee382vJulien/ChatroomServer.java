@@ -13,4 +13,5 @@ public interface ChatroomServer extends Remote{
     public void join(String clientId) throws RemoteException;
     public void talk(String clientId, String message) throws RemoteException;
     public void leave(String clientId) throws RemoteException;
+    public void updateJoins(Integer count) throws RemoteException;
 }

@@ -34,6 +34,12 @@ public class PanelChatClient extends JPanel {
         setChatroom();
     }
     
+    public void updateJoins(Integer count) {
+        lblJoined.setText(count + " joined");
+        revalidate();
+        repaint();
+    }
+    
     public void setChatroom() {
         try {
             lblName.setText("Name: " + chatroom.getName());
@@ -59,6 +65,11 @@ public class PanelChatClient extends JPanel {
     public void leaveChatroom() {
         btnLeave.setEnabled(false);
         btnJoin.setEnabled(true);
+        try {
+            chatClient.leaveChatroom(chatroom.getId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
     
     public void initialize() {

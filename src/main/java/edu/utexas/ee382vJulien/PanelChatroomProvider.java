@@ -1,5 +1,9 @@
 package edu.utexas.ee382vJulien;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -13,21 +17,31 @@ public class PanelChatroomProvider extends JPanel {
     private JLabel lblName;
     private JLabel lblDescription;
     private JLabel lblClients;
-    private Chatroom chatroom;
+    private ChatroomServerImpl chatroom;
+    private WindowChatroomProvider provider;
     
     /**
      * Create the panel.
      */
-    public PanelChatroomProvider(Chatroom chatroom) {
+    public PanelChatroomProvider(ChatroomServerImpl chatroom, WindowChatroomProvider provider) {
         this.chatroom = chatroom;
+        this.provider = provider;
         initialize();
         setChatroom();
     }
     
     public void setChatroom() {
-        lblName.setText("Name:" + chatroom.getName());
-        lblDescription.setText("Description:" + chatroom.getDescription());
-        lblClients.setText(chatroom.getClientCount() + " joined");
+        try {
+            lblName.setText("Name:" + chatroom.getName());
+            lblDescription.setText("Description:" + chatroom.getDescription());
+            lblClients.setText(chatroom.getClientCount() + " joined");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void updateJoins(Integer count) {
+        lblClients.setText(count + " joined");
     }
     
     public void initialize() {
@@ -38,6 +52,18 @@ public class PanelChatroomProvider extends JPanel {
         lblClients = new JLabel("Clients: ");
         
         JButton btnCloseChatroom = new JButton("Close Chatroom");
+        btnCloseChatroom.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chatroom.closeChatroom();
+                try {
+                    PanelChatroomProvider.this.provider.removePanel(PanelChatroomProvider.this.chatroom.getId());
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        });
         GroupLayout groupLayout = new GroupLayout(this);
         groupLayout.setHorizontalGroup(
             groupLayout.createParallelGroup(Alignment.LEADING)

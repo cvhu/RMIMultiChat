@@ -6,7 +6,10 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -30,6 +33,7 @@ public class WindowChatClient {
     private JComboBox comboBoxChatroom;
     private StringBuffer stringBuffer;
     private ChatClientImpl chatClient;
+    private HashMap<String, PanelChatClient> panelsMap;
 
     /**
      * Launch the application.
@@ -52,6 +56,7 @@ public class WindowChatClient {
      */
     public WindowChatClient(ChatClientImpl chatClient) {
         this.chatClient = chatClient;
+        panelsMap = new HashMap<String, PanelChatClient>();
         chatClient.attachWindow(this);
         this.stringBuffer = new StringBuffer();
         initialize();
@@ -64,10 +69,29 @@ public class WindowChatClient {
         panelChatrooms.revalidate();
         panelChatrooms.repaint();
         try {
-            comboBoxChatroom.addItem(new ComboItem(chatroom.getName(), chatroom.getId()));
+            ComboItem comboItem = new ComboItem(chatroom.getName(), chatroom.getId());
+            panelsMap.put(chatroom.getId(), panelChatroom);
+            comboBoxChatroom.addItem(comboItem);
         } catch (RemoteException e) {
             comboBoxChatroom.addItem("Connection Error");
         }
+    }
+    
+    public void removeChatroom(String chatroomId) {
+        for (int i = 0; i < comboBoxChatroom.getItemCount(); i++) {
+            ComboItem comboItem = (ComboItem) comboBoxChatroom.getItemAt(i);
+            if (comboItem.getValue().equals(chatroomId)) {
+                comboBoxChatroom.remove(i);
+                break;
+            }
+        }
+        panelChatrooms.remove(panelsMap.remove(chatroomId));
+        panelChatrooms.revalidate();
+        panelChatrooms.repaint();
+    }
+    
+    public void updateJoins(String chatroomId, Integer count) {
+        panelsMap.get(chatroomId).updateJoins(count);
     }
     
     public void sendMessage() {
@@ -80,6 +104,10 @@ public class WindowChatClient {
         stringBuffer.append("\n");
         textArea.setText(stringBuffer.toString());
     }
+    
+    public void setTitle(String title) {
+        frame.setTitle(String.format("Chat Client (ID:%s)", title));
+    }
 
     /**
      * Initialize the contents of the frame.
@@ -89,6 +117,14 @@ public class WindowChatClient {
         frame.setBounds(100, 100, 647, 748);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Chat Client");
+        
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                WindowChatClient.this.chatClient.closeClient();
+                e.getWindow().dispose();
+            }
+        });
         
         JPanel panelChatroomsWrapper = new JPanel();
         

@@ -24,11 +24,12 @@ public class ChatroomProvider {
         }
     };
     
-    public void addChatroom(Chatroom chatroom) {
+    public ChatroomServerImpl addChatroom(Chatroom chatroom) {
         try {
-            new ChatroomServerImpl(chatroom, chatRegistry);
+            return new ChatroomServerImpl(chatroom, chatRegistry);
         } catch (RemoteException e) {
             e.printStackTrace();
+            return null;
         }
     }
     

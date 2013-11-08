@@ -11,6 +11,7 @@ public class ChatroomServerImpl extends UnicastRemoteObject implements ChatroomS
     
     private Chatroom chatroom;
     private ChatRegistry chatRegistry;
+    private PanelChatroomProvider panel;
 
     protected ChatroomServerImpl(Chatroom chatroom, ChatRegistry chatRegistry) throws RemoteException {
         super();
@@ -54,11 +55,11 @@ public class ChatroomServerImpl extends UnicastRemoteObject implements ChatroomS
         return chatroom.getClientCount();
     }
     
-
     @Override
     public void join(String clientId) throws RemoteException {
         ChatClient client = chatRegistry.getClient(clientId);
         chatroom.addClient(client);
+        chatRegistry.updateJoins(chatroom.getId(), chatroom.getClientCount());
     }
 
     @Override
@@ -68,8 +69,26 @@ public class ChatroomServerImpl extends UnicastRemoteObject implements ChatroomS
 
     @Override
     public void leave(String clientId) throws RemoteException {
-        // TODO Auto-generated method stub
-        
+        chatroom.removeClient(clientId);
+        chatRegistry.updateJoins(chatroom.getId(), chatroom.getClientCount());
+    }
+    
+    public void closeChatroom() {
+        try {
+            chatroom.close();
+            chatRegistry.deregister(this);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void attachPanel(PanelChatroomProvider panel) {
+        this.panel = panel;
+    }
+    
+    @Override
+    public void updateJoins(Integer count) throws RemoteException {
+        panel.updateJoins(count);
     }
     
     public static void main(String[] args) throws Exception {

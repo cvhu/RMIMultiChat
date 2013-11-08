@@ -49,6 +49,15 @@ public class Chatroom {
         }
     }
     
+    public void removeClient(String clientId) {
+        clientsMap.remove(clientId);
+        broadcast(buildMessage(String.format("%s left.", clientId)));
+    }
+    
+    public void close() {
+        broadcast(buildMessage("This chatroom has been closed."));
+    }
+    
     public String buildMessage(String message) {
         return String.format("[%s]%s", name, message);
     }

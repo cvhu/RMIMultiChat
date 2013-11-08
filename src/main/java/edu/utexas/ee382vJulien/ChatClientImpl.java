@@ -17,20 +17,31 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
     private WindowChatClient window;
     private HashMap<String, ChatroomServer> chatroomsMap;
     
-    public ChatClientImpl(String host) throws RemoteException {
+    public ChatClientImpl(final String host) throws RemoteException {
         super();
-        chatroomsMap = new HashMap<String, ChatroomServer>();
-        try{
-            Registry registry = LocateRegistry.getRegistry(host);
-            chatRegistry = (ChatRegistry) registry.lookup("ChatRegistry");
-            register();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (AccessException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WindowChatClient window = new WindowChatClient(ChatClientImpl.this);
+                    chatroomsMap = new HashMap<String, ChatroomServer>();
+                    try{
+                        Registry registry = LocateRegistry.getRegistry(host);
+                        chatRegistry = (ChatRegistry) registry.lookup("ChatRegistry");
+                        register();
+                        window.setTitle(id);
+                    } catch (NotBoundException e) {
+                        e.printStackTrace();
+                    } catch (AccessException e) {
+                        e.printStackTrace();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
     
     public void talk(String chatroomId, String message) {
@@ -44,6 +55,14 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
     
     public void register() throws RemoteException {
         chatRegistry.register(this);
+    }
+    
+    public void closeClient() {
+        try {
+            chatRegistry.deregister(this);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
     
     @Override
@@ -80,26 +99,37 @@ public class ChatClientImpl extends UnicastRemoteObject implements ChatClient{
         }
     }
     
+    public void leaveChatroom(String chatroomId) {
+        System.out.println("leave chatroom " + chatroomId);
+        ChatroomServer server = chatroomsMap.get(chatroomId);
+        try {
+            server.leave(this.id);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
     @Override
     public String getId() throws RemoteException{
         return this.id;
+    }
+   
+    @Override
+    public void closeChatroom(String chatroomId) throws RemoteException {
+        window.removeChatroom(chatroomId);
     }
     
     public void attachWindow(WindowChatClient window) {
         this.window = window;
     }
     
+    @Override
+    public void updateJoins(String chatroomId, Integer count)
+            throws RemoteException {
+        window.updateJoins(chatroomId, count);
+    }
+    
     public static void main(String[] args) throws Exception {
-        final ChatClientImpl chatClient = new ChatClientImpl(args[0]);
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    new WindowChatClient(chatClient);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        new ChatClientImpl(args[0]);
     }
 }

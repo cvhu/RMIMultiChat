@@ -28,6 +28,9 @@ public class ChatRegistryImpl implements ChatRegistry{
         chatClientsMap.put(clientId, client);
         client.registerId(clientId);
         client.showMessage("registered for " + clientId);
+        for (ChatroomServer server : chatroomServersMap.values()) {
+            client.addChatroomServer(server);
+        }
     }
 
     @Override
@@ -42,22 +45,40 @@ public class ChatRegistryImpl implements ChatRegistry{
             client.showMessage(chatroomId + " is added");
         }
     }
-
+    
     @Override
-    public void deregister() throws RemoteException {
-        // TODO Auto-generated method stub
-        
+    public void deregister(ChatClient client) throws RemoteException {
+        chatClientsMap.remove(client.getId());
     }
 
     @Override
-    public void getChatrooms() throws RemoteException {
-        // TODO Auto-generated method stub
-        
+    public void deregister(ChatroomServer server) throws RemoteException {
+        chatroomServersMap.remove(server.getId());
+        for (ChatClient client : chatClientsMap.values()) {
+            try {
+                client.closeChatroom(server.getId());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     @Override
     public ChatClient getClient(String clientId) throws RemoteException {
         return chatClientsMap.get(clientId);
+    }
+    
+    @Override
+    public void updateJoins(String chatroomId, Integer count)
+            throws RemoteException {
+        chatroomServersMap.get(chatroomId).updateJoins(count);
+        for (ChatClient client : chatClientsMap.values()) {
+            try {
+                client.updateJoins(chatroomId, count);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     public static void main(String[] args) throws Exception {
@@ -71,5 +92,4 @@ public class ChatRegistryImpl implements ChatRegistry{
             e.printStackTrace();
         }
     }
-
 }

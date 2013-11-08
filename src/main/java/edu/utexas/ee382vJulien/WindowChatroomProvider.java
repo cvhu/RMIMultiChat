@@ -1,10 +1,12 @@
 package edu.utexas.ee382vJulien;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -16,7 +18,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
-import java.awt.Color;
 
 public class WindowChatroomProvider {
 
@@ -26,6 +27,7 @@ public class WindowChatroomProvider {
     private JLabel lblMessage;
     private JPanel chatrooms;
     private ChatroomProvider chatroomProvider;
+    private HashMap<String, PanelChatroomProvider> panelsMap;
 
     /**
      * Launch the application.
@@ -48,6 +50,7 @@ public class WindowChatroomProvider {
      */
     public WindowChatroomProvider(ChatroomProvider chatroomProvider) {
         this.chatroomProvider = chatroomProvider;
+        panelsMap = new HashMap<String, PanelChatroomProvider>();
         initialize();
         frame.setVisible(true);
     }
@@ -59,13 +62,21 @@ public class WindowChatroomProvider {
             lblMessage.setText("Both name and description are required");
         } else {
             Chatroom chatroom = new Chatroom(name, description);
-            PanelChatroomProvider chatroomPanel = new PanelChatroomProvider(chatroom);
+            ChatroomServerImpl server = chatroomProvider.addChatroom(chatroom);
+            PanelChatroomProvider chatroomPanel = new PanelChatroomProvider(server, this);
             chatrooms.add(chatroomPanel);
+            panelsMap.put(chatroom.getId(), chatroomPanel);
             chatrooms.revalidate();
             chatrooms.repaint();
+            server.attachPanel(chatroomPanel);
             resetForm();
-            chatroomProvider.addChatroom(chatroom);
         }
+    }
+    
+    public void removePanel(String chatroomId) {
+        chatrooms.remove(panelsMap.remove(chatroomId));
+        chatrooms.revalidate();
+        chatrooms.repaint();
     }
     
     public void resetForm() {
